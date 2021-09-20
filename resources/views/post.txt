@@ -1,0 +1,416 @@
+   <div class="post-topbar">
+        <div class="post-st">
+            <ul>
+                <li><a data-toggle="collapse" href="#collapseEventPost" role="button" aria-expanded="false" aria-controls="collapseEventPost">Event Updates</a></li>
+                <li><a class="active" data-toggle="collapse" href="#collapsePost" role="button" aria-expanded="false" aria-controls="collapsePost">New Post</a></li>
+            </ul>
+        </div>
+        <!--post-st end-->
+    </div>
+    <!-- post  -->
+    <div class="collapse" id="collapsePost">
+        <div class="card card-body">
+            <div class="post-project-fields">
+                <form method="POST" action="{{ route('UserPost.store') }}" enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" name="posttype" value="0">
+                    <div class="row">
+
+                        <div class="col-lg-12">
+                            <input type="text" id="title" name="title" placeholder="Title" required>
+                        </div>
+
+                        <div class="col-lg-12">
+                            <input type="file" id="Image" name="Image" placeholder="Image" required>
+                        </div>
+
+                        <div class="col-lg-12">
+                            <textarea name="comments" placeholder="Comments" required></textarea>
+                        </div>
+                        <div class="col-lg-12">
+                            <ul>
+                                <li><button class="active" type="submit" value="post">Post</button></li>
+                                <li><a href="#" title="">Cancel</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Post end  -->  <!--Event  post  -->
+    <div class="collapse" id="collapseEventPost">
+        <div class="card card-body">
+            <div class="post-project-fields">
+                <form method="POST" action="{{ route('UserPost.store') }}" enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" name="posttype" value="1">
+                    <div class="row">
+                        @if(count($teams)>0)
+                        <div class="col-lg-12">
+                            <div class="inp-field">
+                                <select name="team">
+                                    <option vlaue="0">Select Your team</option>
+                                    @foreach($teams as $team)
+                                    <option value="{{$team->team->id}}">{{$team->team->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        @else
+                        @endif
+                        <div class="col-lg-12">
+                            <input type="text" id="title" name="title" placeholder="Title" required>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="inp-field">
+                                <select name="event">
+                                    <option vlaue="">Please select a event</option>
+                                    @if(count($userevents)>0)
+                                    @foreach($userevents as $userevent)
+                                    <option value="{{$userevent->cat_event_id}}">{{$userevent->cat_event->name}}</option>
+                                    @endforeach
+                                    @else
+                                    @endif
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <input type="file" id="Image" name="Image" placeholder="Image" required>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="price-sec">
+                                <div class="price-br">
+                                    <input type="number" name="Km" placeholder="Progressed Km" required>
+                                </div>
+                                <div class="price-br">
+                                    <input type="date" name="date" placeholder="Date" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12">
+                            <textarea name="comments" placeholder="Comments" required></textarea>
+                        </div>
+                        <div class="col-lg-12">
+                            <ul>
+                                <li><button class="active" type="submit" value="post">Post</button></li>
+                                <li><a href="#" title="">Cancel</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Event Post end  -->
+
+
+
+  @if(count($posts)>0)
+  @foreach($posts as $post)
+  <div class="posty">
+      <div class="post-bar no-margin">
+          <div class="post_topbar">
+              <div class="usy-dt">
+                  @if($post->users->profile_pic=="")
+                  <img src="{{ asset('defaultimg/profile_pic.png') }}" alt="" width="50" height="50">
+                  @else
+                  <img src="{{ asset('/storage/ProfilePics/'.$post->users->profile_pic) }}" width="50" height="50">
+                  @endif
+                  <div class="usy-name">
+                      <h3>{{$post->users->nick_name}}</h3>
+                      <span><img src="{{ asset('defaultimg/clock.png') }}" alt="">on {{$post->created_at}}</span>
+                  </div>
+              </div>
+              <div class="ed-opts">
+                  <a href="#" title="" class="ed-opts-open"><i class="la la-ellipsis-v"></i></a>
+                  @if($post->user_id == $user->id)
+                  <ul class="ed-options">
+                      <li>
+                          <button type="button" style="padding: 0; border: none; background: none;" data-toggle="modal" data-target="#Postdeletemodal" data-id="{{$post->id}}">
+                              Delete Post
+                          </button>
+                      </li>
+                  </ul>
+                  @else
+                  <ul class="ed-options">
+                      <li>
+                          <button type="button" style="padding: 0; border: none; background: none;" data-toggle="modal" data-target="#Postreportmodal" data-id="{{$post->id}}">
+                              Report Post
+                          </button>
+                      </li>
+                  </ul>
+                  @endif
+
+              </div>
+          </div>
+
+          <div class="job_descp">
+              <h3>{{$post->title}}</h3>
+              @if($post->posttype == 1)
+              <ul class="job-dt">
+                  <li><a href="#" title="">Progressed</a></li>
+                  <li><span>{{$post->event_progress}} Km</span></li>
+                  <h4>In {{$post->cat_event->category->medal_name}} Medal in {{$post->cat_event->name}}
+                      category on {{$post->progress_date}}</h4>
+              </ul>
+              @if($post->team_id !="")
+              <div class="epi-sec">
+                  <ul class="descp">
+                      #<li><span>{{$post->team->name}}</span></li>
+                  </ul>
+              </div>
+              @endif
+              @elseif($post->posttype == 2)
+              <ul class="job-dt">
+                  <h4>Won the {{$post->cat_event->category->medal_name}} Medal in {{$post->cat_event->name}}
+                      category on {{$post->progress_date}}</h4>
+              </ul>
+              @if($post->team_id !="")
+              <div class="epi-sec">
+                  <ul class="descp">
+                      with the # <li><span>{{$post->team->name}}</span></li> team
+                  </ul>
+              </div>
+              @endif
+              @endif
+
+              <p> {{$post->user_comment}}</p>
+              @if($post->posttype == "2")
+              <img src="{{ asset('/storage/Medals/'.$post->cat_event->category->medal_img) }}" class="img-fluid" width="100%">
+              @else
+              <img src="{{ asset('/storage/UserPost/'.$post->img) }}" class="img-fluid" width="100%">
+              @endif
+          </div>
+          <div class="job-status-bar">
+              <ul class="like-com">
+
+                  <li>
+                      <form method="POST" action="{{ route('UserLikes.store') }}">
+                          @csrf
+                          <input type="hidden" name="postid" value="{{$post->id}}">
+                          @if(isset($post->like))
+                          @if(count($post->like)>0)
+                          <button type="submit" style="padding: 0; border: none; background: none;"><i class="la la-heart" style="color: red;"></i></button> {{count($post->like)}}
+                          @else
+                          <button type="submit" style="padding: 0; border: none; background: none;"><i class="la la-heart" style="color: #b2b2b2;"></i></button>
+                          @endif
+                          @endif
+                      </form>
+                  </li>
+              </ul>
+              <a data-toggle="collapse" href="#{{$post->id}}" role="button" aria-expanded="false" aria-controls="collapseComment">
+                  Comment
+              </a>
+
+          </div>
+      </div>
+      <!--post-bar end-->
+      <div class="collapse" id="{{$post->id}}">
+          <div class="comment-section">
+              <div class="comment-sec">
+                  @foreach($post->comments as $comment)
+                  <ul>
+                      <li>
+                          <div class="comment-list">
+                              <div class="bg-img">
+                                  @if($comment->user->profile_pic=="")
+                                  <img src="{{ asset('defaultimg/profile_pic.png') }}" alt="" width="40" height="40">
+                                  @else
+                                  <img src="{{ asset('/storage/ProfilePics/'.$post->users->profile_pic) }}" width="40" height="40">
+                                  @endif
+                              </div>
+                              <div class="comment">
+                                  <h3>{{ $comment->user->full_name }}</h3>
+                                  <span><img src="images/clock.png" alt=""> {{ $comment->created_at }}</span>
+                                  <p>{{ $comment->comment }}</p>
+
+                              </div>
+                              @if( $comment->user->id ==
+                              Auth::user()->id)
+                              <button type="button" style="padding: 0; border: none; background: none;" data-toggle="modal" data-target="#Commentdeletemodal" data-id="{{$comment->id}}">
+                                  <i class="fa fa-minus-circle text-danger" aria-hidden="true"></i>
+                              </button>
+                              @endif
+                          </div>
+                          <!--comment-list end-->
+                      </li>
+                  </ul>
+                  @endforeach
+              </div>
+              <!--comment-sec end-->
+              <div class="post-comment">
+                  <div class="cm_img">
+                      @if($user->profile_pic =="")
+                      <img src="{{ asset('defaultimg/profile_pic.png') }}" alt="" width="40" height="40">
+                      @else
+                      <img src="{{ asset('/storage/ProfilePics/'.$user->profile_pic) }}" width="40" height="40">
+                      @endif
+                  </div>
+                  <div class="comment_box">
+                      <form method="POST" action="{{ route('UserComment.store') }}">
+                          @csrf
+                          <input type="hidden" name="postid" value="{{ $post->id }}">
+                          <input type="text" name="comment" placeholder="Post a comment" required>
+                          <button type="submit">Send</button>
+                      </form>
+                  </div>
+              </div>
+              <!--post-comment end-->
+          </div>
+          <!--comment-section end-->
+      </div>
+  </div>
+  <!--posty end-->
+  @endforeach
+  @else
+  @endif
+
+
+//////////////////////////////////////////////////
+
+
+
+
+<div class="post-popup pst-pj">
+    <div class="post-project">
+        <h3>Event progress</h3>
+        <div class="post-project-fields">
+            <form method="POST" action="{{ route('UserPost.store') }}" enctype="multipart/form-data">
+                @csrf
+                <input type="hidden" name="posttype" value="0">
+                <div class="row">
+                    @if(count($teams)>0)
+                    <div class="col-lg-12">
+                        <div class="inp-field">
+                            <select name="team">
+                                <option vlaue="0">Select Your team</option>
+                                @foreach($teams as $team)
+                                <option value="{{$team->team->id}}">{{$team->team->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    @else
+                    @endif
+
+                    <div class="col-lg-12">
+                        <input type="text" id="title" name="title" placeholder="Title" required>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="inp-field">
+                            <select name="event" required>
+                                <option vlaue="">Please select a event</option>
+                                @if(count($userevents)>0)
+                                @foreach($userevents as $userevent)
+                                <option value="{{$userevent->cat_event_id}}">{{$userevent->cat_event->name}}</option>
+                                @endforeach
+                                @else
+                                @endif
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-12">
+                        <input type="file" id="Image" name="Image" placeholder="Image" required>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="price-sec">
+                            <div class="price-br">
+                                <input type="number" name="Km" placeholder="Progressed Km" required>
+                            </div>
+                            <span>To</span>
+                            <div class="price-br">
+                                <input type="date" name="date" placeholder="Date" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <textarea name="comments" placeholder="Comments" required></textarea>
+                    </div>
+                    <div class="col-lg-12">
+                        <ul>
+                            <li><button class="active" type="submit" value="post">Post</button></li>
+                            <li><a href="#" title="">Cancel</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <!--post-project-fields end-->
+        <a href="#" title=""><i class="la la-times-circle-o"></i></a>
+    </div>
+    <!--post-project end-->
+</div>
+<!--post-project-popup end-->
+
+<div class="post-popup job_post">
+    <div class="post-project">
+        <h3>New Post </h3>
+        <div class="post-project-fields">
+            <form method="POST" action="{{ route('UserPost.store') }}" enctype="multipart/form-data">
+                @csrf
+                <input type="hidden" name="posttype" value="1">
+                <div class="row">
+                    @if(count($teams)>0)
+                    <div class="col-lg-12">
+                        <div class="inp-field">
+                            <select name="team">
+                                <option vlaue="0">Select Your team</option>
+                                @foreach($teams as $team)
+                                <option value="{{$team->team->id}}">{{$team->team->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    @else
+                    @endif
+                    <div class="col-lg-12">
+                        <input type="text" id="title" name="title" placeholder="Title" required>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="inp-field">
+                            <select name="event" required>
+                                <option vlaue="">Please select a event</option>
+                                @if(count($userevents)>0)
+                                @foreach($userevents as $userevent)
+                                <option value="{{$userevent->cat_event_id}}">{{$userevent->cat_event->name}}</option>
+                                @endforeach
+                                @else
+                                @endif
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <input type="file" id="Image" name="Image" placeholder="Image" required>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="price-sec">
+                            <div class="price-br">
+                                <input type="number" name="Km" placeholder="Progressed Km" required>
+                            </div>
+                            <div class="price-br">
+                                <input type="date" name="date" placeholder="Date" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-12">
+                        <textarea name="comments" placeholder="Comments" required></textarea>
+                    </div>
+                    <div class="col-lg-12">
+                        <ul>
+                            <li><button class="active" type="submit" value="post">Post</button></li>
+                            <li><a href="#" title="">Cancel</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <!--post-project-fields end-->
+        <a href="#" title=""><i class="la la-times-circle-o"></i></a>
+    </div>
+    <!--post-project end-->
+</div>
+<!--post-project-popup end-->
